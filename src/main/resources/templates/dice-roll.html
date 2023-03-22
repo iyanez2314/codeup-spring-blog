@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<nav th:replace="partials :: navbar" />
+
+
+<header th:replace="partials :: header">
+</header>
+
+
+<h1>Welcome to the dice roll page</h1>
+
+<p>Guess a number between 1 and 6:</p>
+<ul>
+    <li><a href="dice-roll/1">1</a></li>
+    <li><a href="dice-roll/2">2</a></li>
+    <li><a href="dice-roll/3">3</a></li>
+    <li><a href="dice-roll/4">4</a></li>
+    <li><a href="dice-roll/5">5</a></li>
+    <li><a href="dice-roll/6">6</a></li>
+</ul>
+<p>
+    The dice roll was:
+    <span th:if="${diceroll != null}" th:text="${diceroll}">
+
+    </span>
+</p>
+<p>
+    Your Guess was:
+    <span th:if="${guess != null}" th:text="${guess}">
+
+    </span>
+</p>
+<p>
+    <span th:text="${message}" th:if="${message != null}"></span>
+</p>
+
+
+<footer th:replace="partials :: footer">
+</footer>
+</body>
+</html>
