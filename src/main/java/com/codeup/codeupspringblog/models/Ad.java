@@ -1,4 +1,4 @@
-package com.codeup.codeupspringblog;
+package com.codeup.codeupspringblog.models;
 import jakarta.persistence.*;
 
 
@@ -14,7 +14,6 @@ public class Ad {
 
     @Column(nullable = false)
     private String description;
-
 
 }
 
