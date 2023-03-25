@@ -8,5 +8,6 @@
 <body>
     <h1 th:text="${post.title}"></h1>
     <p th:text="${post.body}"></p>
+    <p th:if="${userEmail != null}">Created by: <span th:text="${userEmail}"></span> </p>
 </body>
 </html>
