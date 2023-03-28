@@ -1,12 +1,12 @@
 package com.codeup.codeupspringblog.models;
-
-
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"email"})
+})
 public class User {
 
     @Id
@@ -22,8 +22,17 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
+    public User(User copy){
+        id = copy.id;
+        username = copy.username;
+        password = copy.password;
+    }
 
-//    this will hold all the post made by the user
+
+    public User() {
+    }
+
+    //    this will hold all the post made by the user
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Post> posts;
 

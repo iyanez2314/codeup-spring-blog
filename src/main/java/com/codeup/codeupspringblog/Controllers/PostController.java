@@ -3,9 +3,13 @@ package com.codeup.codeupspringblog.Controllers;
 import com.codeup.codeupspringblog.Services.EmailService;
 import com.codeup.codeupspringblog.models.Post;
 import com.codeup.codeupspringblog.models.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 
 @Controller
 public class PostController {
@@ -42,22 +46,34 @@ public class PostController {
         return "posts/show";
     }
 
+
     @GetMapping("/posts/create")
     public String createAPostView(Model model){
-//        We create a new post to implement form model binding
-        model.addAttribute("post", new Post());
-        return "posts/create";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User loggedInUser = (User) ((UsernamePasswordAuthenticationToken) authentication).getPrincipal();
+        if(loggedInUser != null){
+            model.addAttribute("post", new Post());
+            return "posts/create";
+        } else {
+            return "error";
+        }
+
+
     }
 
     @PostMapping("/posts/create")
     public String createAPost(@ModelAttribute Post post){
-        User user = userDao.getById(1L);
-        // We create a new post from the passed in information from our form
-        Post newPost = new Post(post.getTitle(), post.getBody());
-        newPost.setUser(user);
-        postDao.save(newPost);
-        emailService.prepareAndSend(newPost, "not used", "not used");
-        return "redirect:/posts";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            User loggedInUser = (User) ((UsernamePasswordAuthenticationToken) authentication).getPrincipal();
+            System.out.println(loggedInUser.getUsername());
+            Post newPost = new Post(post.getTitle(), post.getBody());
+            newPost.setUser(loggedInUser);
+            postDao.save(newPost);
+            return "redirect:/posts";
+        } else {
+            return "error";
+        }
     }
 
 
