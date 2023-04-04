@@ -58,4 +58,7 @@ public class Post {
     }
 
 
+    public long getId() {
+        return id;
+    }
 }
