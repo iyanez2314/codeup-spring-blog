@@ -3,9 +3,9 @@ package com.codeup.codeupspringblog.Controllers;
 import com.codeup.codeupspringblog.Services.EmailService;
 import com.codeup.codeupspringblog.models.Post;
 import com.codeup.codeupspringblog.models.User;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -47,57 +47,50 @@ public class PostController {
     }
 
 
+
+
+
     @GetMapping("/posts/create")
     public String createAPostView(Model model){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User loggedInUser = (User) ((UsernamePasswordAuthenticationToken) authentication).getPrincipal();
-        if(loggedInUser != null){
-            model.addAttribute("post", new Post());
-            return "posts/create";
-        } else {
-            return "error";
-        }
-
-
+        model.addAttribute("post", new Post());
+       return "/posts/create";
     }
 
     @PostMapping("/posts/create")
     public String createAPost(@ModelAttribute Post post){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            User loggedInUser = (User) ((UsernamePasswordAuthenticationToken) authentication).getPrincipal();
-            System.out.println(loggedInUser.getUsername());
-            Post newPost = new Post(post.getTitle(), post.getBody());
-            newPost.setUser(loggedInUser);
-            postDao.save(newPost);
-            return "redirect:/posts";
-        } else {
-            return "error";
-        }
+        User user = userDao.findById(1L).get();
+        post.setUser(user);
+        emailService.prepareAndSend(post);
+        postDao.save(post);
+        return "redirect:/posts";
     }
 
 
     @GetMapping("/posts/{id}/edit")
-    public String showEditPostView(@PathVariable("id") Long id, Model model){
-        Post post = postDao.getById(id);
-        if(post != null){
-            model.addAttribute("post", post);
-            return "posts/edit";
-        } else {
-            return "Post not found";
-        }
+    public String showEditPostView(@PathVariable("id") Long id, Model model) {
+        Post editedPost = postDao.findById(id).get();
+        model.addAttribute("post", editedPost);
+        return "posts/edit";
     }
 
+
     @PostMapping("/posts/{id}/edit")
-    public String editPost(@RequestParam("title") String title, @RequestParam("body") String body, @PathVariable("id") Long id){
-        Post post = postDao.getById(id);
-        if(post != null){
-            post.setTitle(title);
-            post.setBody(body);
-            postDao.save(post);
+    public String editPost(@ModelAttribute Post post, @PathVariable Long id) {
+            Post editedPost = postDao.findById(id).get();
+            editedPost.setTitle(post.getTitle());
+            editedPost.setBody(post.getBody());
+            postDao.save(editedPost);
             return "redirect:/posts";
-        } else {
-            return "error";
-        }
     }
+
+
+//    @PostMapping("posts/{id}/edit")
+//    public String editPost(@ModelAttribute Post post, @PathVariable long id){
+//        User user = Users.randomUser(usersDao);
+//        post.setUser(user);
+//        post.setId(id);
+//        postsDao.save(post);
+//        return "redirect:/posts/" + id +"/find";
+//    }
+
 }
